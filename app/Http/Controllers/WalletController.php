@@ -1,12 +1,12 @@
 <?php
 namespace App\Http\Controllers;
 
+use App\Http\Requests\LoadWalletRequest;
+use App\Http\Requests\PayRequest;
 use App\Services\SoapService;
-use App\Http\Requests\RegisterClientRequest;
-use Illuminate\Http\RedirectResponse;
 
 
-class UserController extends Controller
+class WalletController extends Controller
 {
     protected $soapService;
 
@@ -15,17 +15,18 @@ class UserController extends Controller
         $this->soapService = $soapService;
     }
 
-    public function registerClient(RegisterClientRequest $request)
+    public function loadWallet(LoadWalletRequest $request)
     {
         $data = $request->validated();
 
-        $response = $this->soapService->registerClient(
+        $response = $this->soapService->loadWallet(
             $request->file('document'),
-            $data['name'],
-            $data['email'],
-            $data['phone']
+            $data['phone'],
+            $data['value']
         );
 
         return response()->json($response);
     }
+
+    
 }

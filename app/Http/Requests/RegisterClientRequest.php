@@ -40,17 +40,5 @@ class RegisterClientRequest extends FormRequest
         ];
     }
 
-    public function after(): array
-    {
-        return [
-            function (Validator $validator) {
-                if ($this->somethingElseIsInvalid()) {
-                    $validator->errors()->add(
-                        'field',
-                        'Something is wrong with this field!'
-                    );
-                }
-            }
-        ];
-    }
+    
 }

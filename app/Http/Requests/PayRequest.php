@@ -11,6 +11,15 @@ class PayRequest extends FormRequest
         return true;
     }
 
+    protected function prepareForValidation()
+    {
+        if ($this->has('amount')) {
+            $this->merge([
+                'value' => is_numeric($this->value) ? (float) $this->value : 0
+            ]);
+        }
+    }
+
     public function rules()
     {
         return [
