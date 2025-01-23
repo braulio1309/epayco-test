@@ -11,6 +11,16 @@ class LoadWalletRequest extends FormRequest
         return true;
     }
 
+    protected function prepareForValidation()
+    {
+        // Convierte 'value' a número (float, por ejemplo)
+        if ($this->has('value')) {
+            $this->merge([
+                'value' => is_numeric($this->value) ? (float) $this->value : 0
+            ]);
+        }
+    }
+    
     public function rules()
     {
         return [

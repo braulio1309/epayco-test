@@ -3,6 +3,8 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\WalletController;
+
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -15,4 +17,6 @@ use App\Http\Controllers\UserController;
 */
 
 Route::post('/registerUser', [UserController::class, 'registerClient'])->name('registerUser');
+Route::post('/wallet/load', [WalletController::class, 'loadWallet'])->name('loadWallet');
+
 

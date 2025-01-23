@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Services;
 
 use App\Models\User;
@@ -34,6 +35,32 @@ class SoapService
             ];
         }
     }
+
+    public function loadWallet($document, $phone, $value)
+    {
+        $user = User::where('document', $document)->where('phone', $phone)->first();
+
+        if (!$user) {
+            return [
+                'success' => false,
+                'cod_error' => '01',
+                'message_error' => 'Usuario no encontrado.',
+                'data' => null,
+            ];
+        }
+
+        $wallet = $user->wallet;
+        $wallet->balance += $value;
+        $wallet->save();
+
+        return [
+            'success' => true,
+            'cod_error' => '00',
+            'message_error' => 'Recarga exitosa.',
+            'data' => ['balance' => $wallet->balance],
+        ];
+    }
+
 
     // Similar methods for loadWallet, pay, confirmPayment, and checkBalance
 }
