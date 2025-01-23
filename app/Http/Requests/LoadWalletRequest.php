@@ -24,7 +24,7 @@ class LoadWalletRequest extends FormRequest
     public function rules()
     {
         return [
-            'document' => 'required|exists:users,document',
+            'document' => 'required|file',
             'phone' => 'required|exists:users,phone',
             'value' => 'required|numeric|min:1',
         ];

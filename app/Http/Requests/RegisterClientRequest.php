@@ -19,7 +19,7 @@ class RegisterClientRequest extends FormRequest
     public function rules()
     {
         return [
-            'document' => 'required|unique:users,document',
+            'document' => 'required|file',
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
             'phone' => 'required|regex:/^[0-9]{10,15}$/',

@@ -216,6 +216,40 @@ class SoapService
         ];
     }
 
+    public function consultBalance($document, $phone)
+    {
+        // Buscar el usuario con el documento y teléfono
+        $user = User::where('phone', $phone)->first();
+
+        if(!$this->compareFiles($document, $user->document)){
+            return [
+                'success' => false,
+                'cod_error' => '01',
+                'message_error' => 'Su archivo no coincide.',
+                'data' => null,
+            ];
+        }
+
+        if (!$user) {
+            return response()->json([
+                'success' => false,
+                'cod_error' => '01', // Error, usuario no encontrado
+                'message_error' => 'No se encontró un usuario con ese documento y teléfono.',
+                'data' => []
+            ]);
+        }
+
+        // Si se encuentra el usuario, retornar el saldo
+        return response()->json([
+            'success' => true,
+            'cod_error' => '00', // Éxito
+            'message_error' => 'Saldo consultado correctamente.',
+            'data' => [
+                'balance' => $user->wallet->balance
+            ]
+        ]);
+    }
+
 
 
 
