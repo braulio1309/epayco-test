@@ -13,6 +13,9 @@ return new class extends Migration
     {
         Schema::create('sessions', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->string('token');
+            $table->boolean('confirmed')->default(false);
             $table->timestamps();
         });
     }
