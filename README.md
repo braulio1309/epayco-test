@@ -1,66 +1,119 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# API - Billetera Virtual
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Este proyecto es una API de billetera virtual que permite realizar varias operaciones, como el registro de clientes, recarga de billetera, pago de compras, confirmación de pagos y consulta de saldo. A continuación se detallan las rutas disponibles, los parámetros que reciben y lo que retornan.
 
-## About Laravel
+## Rutas
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+### 1. Registro de Cliente
+- **Método**: `POST`
+- **Ruta**: `/api/register-client`
+- **Descripción**: Registra un nuevo cliente en el sistema.
+- **Parámetros**:
+  - `document` (required): Documento de identificación del cliente (solo números).
+  - `name` (required): Nombre completo del cliente.
+  - `email` (required): Correo electrónico del cliente.
+  - `phone` (required): Número de teléfono del cliente (formato de 10 a 15 dígitos).
+- **Respuesta**:
+  ```json
+  {
+    "success": true,
+    "cod_error": "00",
+    "message_error": "Cliente registrado con éxito",
+    "data": {
+      "id": 1,
+      "document": "12345678",
+      "name": "Juan Perez",
+      "email": "juan.perez@example.com",
+      "phone": "1234567890"
+    }
+  }
+  ```
+### 2. Recarga de Billetera
+- **Método**: `POST`
+- **Ruta**: `/api/load-wallet`
+- **Descripción**: Permite recargar la billetera de un cliente. El valor especificado se agrega al saldo actual del cliente. 
+- **Parámetros**:
+  - `document` (required): Documento de identificación del cliente (solo números).
+  - `phone` (required): Número de teléfono del cliente.
+  - `value` (required): Monto a recargar (número positivo). Este es el valor que se añadirá al saldo actual de la billetera.
+  
+#### Ejemplo de Petición:
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+```bash
+POST /api/load-wallet
+Content-Type: application/json
+{
+  "document": "12345678",
+  "phone": "1234567890",
+  "value": 500
+}
+  ```
+```bash
+{
+  "success": true,
+  "cod_error": "00",
+  "message_error": "Billetera recargada con éxito",
+  "data": {
+    "document": "12345678",
+    "phone": "1234567890",
+    "new_balance": 2000
+  }
+}
+  ```
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+### 3. Pagar
+- **Método**: `POST`
+- **Ruta**: `/api/pay`
+- **Descripción**: Permite realizar el pago con el saldo de la billetera. Un token de 6 dígitos es enviado al correo del usuario para confirmación.
+- **Parámetros**:
+  - `document` (required): Documento de identificación del cliente (solo números).
+  - `phone` (required): Número de teléfono del cliente.
+  - `amount` (required): Monto de la compra a pagar (número positivo).
+  
+#### Ejemplo de Petición:
 
-## Learning Laravel
+```bash
+POST /api/pay
+Content-Type: application/json
+{
+  "document": "12345678",
+  "phone": "1234567890",
+  "amount": 100
+}
+```
+### 4. Confirmar Pago
+- **Método**: `POST`
+- **Ruta**: `/api/confirm-payment`
+- **Descripción**: Confirma el pago de una compra utilizando el `session_id` y el token enviado al correo del cliente. Si la validación es exitosa, se descuenta el monto de la billetera.
+- **Parámetros**:
+  - `session_id` (required): ID de la sesión generado al momento de realizar el pago.
+  - `token` (required): Token enviado al correo del cliente para confirmar la compra.
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+#### Ejemplo de Petición:
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+```bash
+POST /api/confirm-payment
+Content-Type: application/json
+{
+  "session_id": "df9f221e-260f-453d-b2d7-0c7daf2ad25a",
+  "token": "123456"
+}
+```
+### 5. Consultar Saldo
+- **Método**: `POST`
+- **Ruta**: `/api/consult-balance`
+- **Descripción**: Consulta el saldo de la billetera de un cliente usando su `documento` y `número de celular`. Los dos valores deben coincidir para obtener el saldo.
+- **Parámetros**:
+  - `document` (required): Documento del cliente.
+  - `phone` (required): Número de celular del cliente.
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+#### Ejemplo de Petición:
 
-## Laravel Sponsors
+```bash
+POST /api/consult-balance
+Content-Type: application/json
+{
+  "document": "12345678",
+  "phone": "9876543210"
+}
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
-
-### Premium Partners
-
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
-
-## Contributing
-
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
-
-## Code of Conduct
-
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
